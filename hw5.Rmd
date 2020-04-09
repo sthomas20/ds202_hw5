@@ -7,6 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(lubridate)
 ```
 
 ## Liquor Sales in Iowa
@@ -23,10 +26,29 @@ This dataset https://data.iowa.gov/Sales-Distribution/2019-Iowa-Liquor-Sales/38x
   d. Export -- CSV -- Download
   e. Use `readr::read_csv` to import.
   
+```{r}
+ames<- read_csv("2019_Iowa_Liquor_Sales.csv")
+#used session-> set working directory 
+```
+  
 2. Data cleaning: 
   a. extract geographic latitude and longitude from the variable `Store Location`
   b. make sure the variables are in the correct type, by converting incorrect variable types.
   c. extract year, month and day from the variable `Date` as separate columns.
+  
+```{r}
+store_location<- ames[ , "Store Location"]
+store_location <- separate(store_location, "Store Location", into = c("latitude", "longitude"), sep = " (?=[^ ]+$)")
+
+store_location$latitude<- gsub("POINT \\(", "", store_location$latitude)
+store_location$longitude<- gsub("\\)", "", store_location$longitude)
+
+#Question 2b
+store_location$latitude<- as.double(store_location$latitude)
+store_location$longitude<- as.double(store_location$longitude)
+str(store_location)
+
+```
 3. First overview:
   a. Plot a scatterplot of lat and long of store locations. 
   b. Provide a visual breakdown of the liquor category (by `Category Name`). Include volume sold in the breakdown.

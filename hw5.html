@@ -383,6 +383,24 @@ summary {
 <li>Export – CSV – Download</li>
 <li>Use <code>readr::read_csv</code> to import.</li>
 </ol>
+<pre class="r"><code>ames&lt;- read_csv(&quot;2019_Iowa_Liquor_Sales.csv&quot;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   `Invoice/Item Number` = col_character(),
+##   Date = col_character(),
+##   `Store Name` = col_character(),
+##   Address = col_character(),
+##   City = col_character(),
+##   `Store Location` = col_character(),
+##   County = col_character(),
+##   `Category Name` = col_character(),
+##   `Vendor Number` = col_character(),
+##   `Vendor Name` = col_character(),
+##   `Item Description` = col_character()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<pre class="r"><code>#used session-&gt; set working directory </code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Data cleaning:</li>
 </ol>
@@ -391,6 +409,19 @@ summary {
 <li>make sure the variables are in the correct type, by converting incorrect variable types.</li>
 <li>extract year, month and day from the variable <code>Date</code> as separate columns.</li>
 </ol>
+<pre class="r"><code>store_location&lt;- ames[ , &quot;Store Location&quot;]
+store_location &lt;- separate(store_location, &quot;Store Location&quot;, into = c(&quot;latitude&quot;, &quot;longitude&quot;), sep = &quot; (?=[^ ]+$)&quot;)
+
+store_location$latitude&lt;- gsub(&quot;POINT \\(&quot;, &quot;&quot;, store_location$latitude)
+store_location$longitude&lt;- gsub(&quot;\\)&quot;, &quot;&quot;, store_location$longitude)
+
+#Question 2b
+store_location$latitude&lt;- as.double(store_location$latitude)
+store_location$longitude&lt;- as.double(store_location$longitude)
+str(store_location)</code></pre>
+<pre><code>## Classes 'tbl_df', 'tbl' and 'data.frame':    63103 obs. of  2 variables:
+##  $ latitude : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ longitude: num  NA NA NA NA NA NA NA NA NA NA ...</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>First overview:</li>
 </ol>
