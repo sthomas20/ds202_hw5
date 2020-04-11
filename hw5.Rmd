@@ -27,8 +27,9 @@ This dataset https://data.iowa.gov/Sales-Distribution/2019-Iowa-Liquor-Sales/38x
   e. Use `readr::read_csv` to import.
   
 ```{r}
+#used session-> set working directory -> to source file location
 ames<- read_csv("2019_Iowa_Liquor_Sales.csv")
-#used session-> set working directory 
+
 ```
   
 2. Data cleaning: 
@@ -71,7 +72,7 @@ ggplot(ames$store_location, aes(x=latitude, y=longitude)) + geom_point() + xlab(
 ames %>%
   group_by(`Category Name`) %>%
   summarise(total_vol = sum(`Volume Sold (Gallons)`)) %>%
-  ggplot(ames, mapping = aes(x=`Category Name`, y = total_vol, fill=`Category Name`)) + geom_col() + coord_flip() + xlab("Volume Gallons") + ylab('Liqour') + ggtitle('Liqour category by volume') + theme(legend.position = "none")
+  ggplot(ames, mapping = aes(x=`Category Name`, y = total_vol, fill=`Category Name`)) + geom_col() + coord_flip() + xlab("Liqour") + ylab('Volume (Gallons)') + ggtitle('Liqour category by volume') + theme(legend.position = "none")
 
 ```
   
@@ -81,34 +82,49 @@ ames %>%
 ```{r}
 ames %>%
   group_by(date_new) %>%
-  summarise(money_spent = sum(`State Bottle Retail`), num_sales= sum(`Sale (Dollars)`), Volume_of_liq_sold = sum(`Volume Sold (Gallons)`))
+  summarise(Volume_of_liq_sold = sum(`Volume Sold (Gallons)`)) %>%
+  ggplot(ames, mapping = aes(date_new, y=Volume_of_liq_sold)) + geom_line() + scale_x_date() + ylab('Volume in Gallons') + xlab('Date') + ggtitle("Time series of Volume Sold")
+ 
+ames %>%
+  group_by(date_new) %>%
+  summarise(money_spent = sum(`State Bottle Retail`)) %>%
+  ggplot(ames, mapping = aes(date_new, y=money_spent)) + geom_line() + scale_x_date() + xlab('Date') + ylab('Dollars') + ggtitle("Time series of Money Spent (State Bottle Retail)")
+
+ames %>%
+  group_by(date_new) %>%
+  summarise(num_sales= sum(`Sale (Dollars)`)) %>%
+  ggplot(ames, mapping = aes(date_new, y=num_sales)) + geom_line() + scale_x_date() + xlab('Date') + ylab('Dollars') + ggtitle("Time series of Sales")
 
 ```
+ 
+  Based on the output above you can see that the all three of the graphs tend to sharply spike up and down through out the months. You can see that the first and third graph have their highest spikes during similar times.
+
 
 5. Plot volume sold by day (use a scatterplot of volume by day and facet by month). Discover trends with the help of `geom_smooth`. Describe any patterns.
 ```{r}
 ames %>%
   group_by(Day, Month) %>%
   summarise(volume_by_day = sum(`Volume Sold (Gallons)`)) %>%
-  ggplot(ames, mapping = aes(x=volume_by_day, y=Day)) + geom_point() + facet_wrap(~Month) + coord_flip() + geom_smooth(method = lm, se = FALSE ) + xlab('Day of Month') + ylab('Volume in Gallons') + ggtitle('Volume sold by Day')
+  ggplot(ames, mapping = aes(x=volume_by_day, y=Day)) + geom_point() + facet_wrap(~Month) + coord_flip() + geom_smooth(method = lm, se = FALSE ) + ylab('Day of Month') + xlab('Volume in Gallons') + ggtitle('Volume sold by Day')
 
 ```
 
-  Based on the output above it seems like an increase in sales during the summer months like July and August. 
+  Based on the output above it seems like an increase in sales during the summer months like July and August. You can see that there is a positive gradual increase during those months as well
   
 6. Find the dates for ISU football home games in Fall 2019. Can you see a pattern? 
 ```{r, fig.width=10}
 #found the dates of the ISU 2019 Home cames here https://cyclones.com/sports/football/schedule/2019
 
-ISU_date<- c("07/31/2019", "08/14/2019", "08/21/2019", "10/05/2019", "10/26/2019", "11/16/2019", "11/23/2019")
+ISU_date<- c("08/31/2019", "09/14/2019", "09/21/2019", "10/05/2019", "10/26/2019", "11/16/2019", "11/23/2019")
+
 ames$home_game = (ames$Date %in% ISU_date)
 
 ames %>%
-  ggplot(ames, mapping = aes(x=date_new, y = `Sale (Dollars)`, fill= home_game)) + geom_col() 
+  ggplot(ames, mapping = aes(x=date_new, y = `Sale (Dollars)`, fill= home_game)) + geom_col() + xlab('Date') + ylab('Dollars') + ggtitle("Liqour Sales during 2019 ISU Football Home Games")
 
 ```
 
-  Based on the output above it seems like there is a large amount of liqour sold during home games. Especially during the month of August there is a very large amount of alcohol sold and this does make sense as this is the start of the football season so you can imagine many people going to the games and tailgating. 
+  After finding the dates for the home games on the ISU Football website it was interesting to see that no dates for home games matched up with the dates from the csv file and you can see this from my output above since there are no true values. That being said it is hard to tell what the correlation between sales during home games are. But based on just guessing on the sales around the times of the home games you can see that the liqour sales do seem to be relatively higher which would make sense since during football season people tend to tailgate before games and drink alcohol.
   
   
 Note: your submission is supposed to be fully reproducible, i.e. the TA and I will 'knit' your submission in RStudio. 
